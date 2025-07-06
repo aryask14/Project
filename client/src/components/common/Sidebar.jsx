@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { Drawer, List, ListItem, ListItemIcon,Box,Typography, ListItemText, Divider, IconButton } from '@mui/material';
+import React from 'react';
+import { Drawer, List, ListItem, ListItemIcon, Box, Typography, ListItemText, Divider, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import PeopleIcon from '@mui/icons-material/People';
+import PersonIcon from '@mui/icons-material/Person'; // Added missing import
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import authService from '../../services/authService';
 
-const drawerWidth = 240;
+const drawerWidth = 240; // Defined drawerWidth
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -20,27 +20,32 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-const Sidebar = () => {
-  const [open, setOpen] = useState(true);
+const Sidebar = ({ open, toggleDrawer }) => {
+  const location = useLocation();
   const user = authService.getCurrentUser();
 
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
+  const menuItems = [
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    { text: 'Profile', icon: <PersonIcon />, path: '/dashboard/profile' }, // Now using properly imported PersonIcon
+    { text: 'Doctors', icon: <MedicalServicesIcon />, path: '/doctors' },
+    { text: 'Appointments', icon: <CalendarTodayIcon />, path: '/appointments' },
+    ...(user?.role === 'admin' ? [
+      { text: 'Admin', icon: <AdminPanelSettingsIcon />, path: '/admin' }
+    ] : [])
+  ];
 
   return (
     <Drawer
       variant="permanent"
       open={open}
       sx={{
-        width: drawerWidth,
+        width: open ? drawerWidth : 56,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-          width: drawerWidth,
+          width: open ? drawerWidth : 56,
           boxSizing: 'border-box',
-          backgroundColor: '#ffffff',
-          borderRight: '1px solid #e2e8f0',
-          boxShadow: '2px 0 10px rgba(0, 0, 0, 0.05)',
+          transition: 'width 0.3s ease',
+          overflowX: 'hidden',
         },
       }}
     >
@@ -52,9 +57,9 @@ const Sidebar = () => {
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <MedicalServicesIcon sx={{ mr: 1 }} />
-          <Typography variant="subtitle1" fontWeight="600">
+          {open && <Typography variant="subtitle1" fontWeight="600">
             MediBook Pro
-          </Typography>
+          </Typography>}
         </Box>
         <IconButton onClick={toggleDrawer} sx={{ color: 'white' }}>
           <ChevronLeftIcon />
@@ -64,35 +69,46 @@ const Sidebar = () => {
       <Divider />
       
       <List sx={{ pt: 1 }}>
-        <ListItem 
-          button 
-          component={Link} 
-          to="/dashboard"
-          sx={{
-            borderRadius: '8px',
-            mx: 1,
-            my: 0.5,
-            '&:hover': {
-              backgroundColor: 'primary.light',
-              '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-                color: 'white',
+        {menuItems.map((item) => (
+          <ListItem 
+            button 
+            key={item.text}
+            component={Link} 
+            to={item.path}
+            selected={location.pathname === item.path}
+            sx={{
+              borderRadius: '8px',
+              mx: 1,
+              my: 0.5,
+              minHeight: 48,
+              justifyContent: open ? 'initial' : 'center',
+              px: 2.5,
+              '&:hover': {
+                backgroundColor: 'primary.light',
+                '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+                  color: 'white',
+                },
               },
-            },
-            '&.Mui-selected': {
-              backgroundColor: 'primary.main',
-              '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-                color: 'white',
+              '&.Mui-selected': {
+                backgroundColor: 'primary.main',
+                '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+                  color: 'white',
+                },
               },
-            },
-          }}
-        >
-          <ListItemIcon>
-            <DashboardIcon />
-          </ListItemIcon>
-          <ListItemText primary="Dashboard" />
-        </ListItem>
-        
-        {/* Other list items with similar styling */}
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                mr: open ? 3 : 'auto',
+                justifyContent: 'center',
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+            {open && <ListItemText primary={item.text} />}
+          </ListItem>
+        ))}
       </List>
     </Drawer>
   );

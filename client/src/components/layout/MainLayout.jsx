@@ -1,22 +1,39 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { Box, CssBaseline, Toolbar } from '@mui/material';
+import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import { Box, CssBaseline } from '@mui/material';
 import Navbar from '../common/Navbar';
 import Sidebar from '../common/Sidebar';
-import authService from '../../services/authService';
+
+const drawerWidth = 240;
 
 const MainLayout = () => {
-  if (!authService.isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <Navbar />
-      <Sidebar />
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Toolbar />
+      <Navbar 
+        sidebarOpen={sidebarOpen} 
+        toggleSidebar={toggleSidebar} 
+      />
+      <Sidebar 
+        open={sidebarOpen} 
+        toggleDrawer={toggleSidebar} 
+      />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          transition: 'margin 225ms cubic-bezier(0.4, 0, 0.6, 1) 0ms',
+          marginLeft: sidebarOpen ? `${drawerWidth}px` : '56px',
+          width: `calc(100% - ${sidebarOpen ? drawerWidth : 56}px)`
+        }}
+      >
         <Outlet />
       </Box>
     </Box>

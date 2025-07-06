@@ -1,17 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { Box, Container, CssBaseline } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Box, Container } from '@mui/material';
 import authService from '../../services/authService';
-
-const AuthBackground = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.light,
-  minHeight: '100vh',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: theme.spacing(3),
-}));
 
 const AuthLayout = () => {
   if (authService.isAuthenticated()) {
@@ -19,12 +9,18 @@ const AuthLayout = () => {
   }
 
   return (
-    <AuthBackground>
-      <CssBaseline />
+    <Box sx={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+      p: 3
+    }}>
       <Container maxWidth="sm">
         <Outlet />
       </Container>
-    </AuthBackground>
+    </Box>
   );
 };
 

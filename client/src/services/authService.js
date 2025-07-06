@@ -4,35 +4,31 @@ const authService = {
   },
 
   getCurrentUser: () => {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    try {
+      const user = localStorage.getItem('user');
+      return user ? JSON.parse(user) : null;
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      return null;
+    }
   },
 
   login: async (email, password) => {
-    // This will be replaced with actual API call in the backend phase
-    // For now, we'll mock the response
+    const mockUsers = [
+      { id: 1, name: 'Admin', email: 'admin@example.com', password: 'admin123', role: 'admin' },
+      { id: 2, name: 'User', email: 'user@example.com', password: 'user123', role: 'user' }
+    ];
+
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        if (email === 'admin@example.com' && password === 'admin123') {
-          const user = {
-            id: 1,
-            name: 'Admin User',
-            email: 'admin@example.com',
-            role: 'admin',
-          };
-          localStorage.setItem('authToken', 'mock-token');
-          localStorage.setItem('user', JSON.stringify(user));
-          resolve(user);
-        } else if (email === 'user@example.com' && password === 'user123') {
-          const user = {
-            id: 2,
-            name: 'Regular User',
-            email: 'user@example.com',
-            role: 'user',
-          };
-          localStorage.setItem('authToken', 'mock-token');
-          localStorage.setItem('user', JSON.stringify(user));
-          resolve(user);
+        const user = mockUsers.find(u => u.email === email && u.password === password);
+        
+        if (user) {
+          const { password: _, ...userData } = user;
+          localStorage.setItem('authToken', 'mock-token-' + user.id);
+          localStorage.setItem('user', JSON.stringify(userData));
+          window.location.href = '/'; // Redirect to home after login
+          resolve(userData);
         } else {
           reject(new Error('Invalid email or password'));
         }
@@ -41,20 +37,21 @@ const authService = {
   },
 
   register: async (name, email, password) => {
-    // This will be replaced with actual API call in the backend phase
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        if (email && password && name) {
-          const user = {
-            id: Math.floor(Math.random() * 1000),
+        try {
+          const newUser = {
+            id: Math.floor(Math.random() * 10000),
             name,
             email,
-            role: 'user',
+            role: 'user'
           };
-          localStorage.setItem('authToken', 'mock-token');
-          localStorage.setItem('user', JSON.stringify(user));
-          resolve(user);
-        } else {
+          
+          localStorage.setItem('authToken', 'mock-token-' + newUser.id);
+          localStorage.setItem('user', JSON.stringify(newUser));
+          window.location.href = '/'; // Redirect to home after registration
+          resolve(newUser);
+        } catch (error) {
           reject(new Error('Registration failed'));
         }
       }, 500);
@@ -65,7 +62,7 @@ const authService = {
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
     window.location.href = '/login';
-  },
+  }
 };
 
 export default authService;

@@ -229,8 +229,8 @@ const doctorService = {
   getAllDoctors: async () => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(mockDoctors);
-      }, 500);
+        resolve([...mockDoctors]); // Return a copy to prevent direct modification
+      }, 300); // Simulate network delay
     });
   },
 
@@ -239,11 +239,11 @@ const doctorService = {
       setTimeout(() => {
         const doctor = mockDoctors.find(d => d.id === parseInt(id));
         if (doctor) {
-          resolve(doctor);
+          resolve({ ...doctor }); // Return a copy
         } else {
-          reject(new Error('Doctor not found'));
+          reject(new Error(`Doctor with ID ${id} not found`));
         }
-      }, 500);
+      }, 300);
     });
   },
 
@@ -257,20 +257,21 @@ const doctorService = {
         }
 
         const dayOfWeek = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
-        const slots = doctor.availability[dayOfWeek] || [];
+        let slots = doctor.availability[dayOfWeek] || [];
         
-        // Filter out slots that would be in the past if the date is today
-        const now = new Date();
-        if (new Date(date).toDateString() === now.toDateString()) {
+        // Filter out past slots if date is today
+        if (new Date(date).toDateString() === new Date().toDateString()) {
+          const now = new Date();
           const currentHour = now.getHours();
           const currentMinute = now.getMinutes();
-          resolve(slots.filter(slot => {
+          
+          slots = slots.filter(slot => {
             const [hour, minute] = slot.split(':').map(Number);
             return hour > currentHour || (hour === currentHour && minute > currentMinute);
-          }));
-        } else {
-          resolve(slots);
+          });
         }
+        
+        resolve([...slots]); // Return a copy
       }, 300);
     });
   },
@@ -278,10 +279,25 @@ const doctorService = {
   getDoctorReviews: async (doctorId) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve(mockReviews[doctorId] || []);
+        resolve([...(mockReviews[doctorId] || [])]); // Return a copy
       }, 300);
     });
   },
+
+  searchDoctors: async (query) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const results = mockDoctors.filter(doctor =>
+          doctor.name.toLowerCase().includes(query.toLowerCase()) ||
+          doctor.specialty.toLowerCase().includes(query.toLowerCase()) ||
+          doctor.specializations.some(s => 
+            s.toLowerCase().includes(query.toLowerCase())
+          )
+        );
+        resolve([...results]);
+      }, 300);
+    });
+  }
 };
 
 export default doctorService;

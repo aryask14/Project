@@ -1,5 +1,13 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, Avatar, Box } from '@mui/material';
+import React, { useState } from 'react';
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Button, 
+  IconButton, 
+  Avatar, 
+  Box 
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import { styled } from '@mui/material/styles';

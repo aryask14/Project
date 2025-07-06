@@ -13,6 +13,7 @@ import AppointmentPage from './pages/appointment/AppointmentPage';
 import UserDashboard from './pages/user/UserDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import NotFoundPage from './pages/NotFoundPage';
+import UserProfilePage from './pages/user/UserProfilePage';
 
 const theme = createTheme({
   palette: {
@@ -32,67 +33,9 @@ const theme = createTheme({
       default: '#f8fafc',
       paper: '#ffffff',
     },
-    text: {
-      primary: '#2d3748',
-      secondary: '#4a5568',
-    },
   },
   typography: {
-    fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 700,
-      fontSize: '2.5rem',
-      lineHeight: 1.2,
-    },
-    h2: {
-      fontWeight: 600,
-      fontSize: '2rem',
-    },
-    h3: {
-      fontWeight: 600,
-      fontSize: '1.75rem',
-    },
-    button: {
-      textTransform: 'none',
-      fontWeight: 600,
-    },
-  },
-  shape: {
-    borderRadius: 8,
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          padding: '8px 16px',
-          transition: 'all 0.3s ease',
-        },
-        contained: {
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-          },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: '12px',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
-          transition: 'all 0.3s ease',
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '8px',
-          },
-        },
-      },
-    },
+    fontFamily: '"Poppins", "Roboto", sans-serif',
   },
 });
 
@@ -110,11 +53,12 @@ function App() {
 
           {/* Protected routes */}
           <Route element={<MainLayout />}>
-            <Route path="/" element={<HomePage />} />
+            <Route index element={<HomePage />} />
+            <Route path="/dashboard" element={<UserDashboard />} />
+            <Route path="/dashboard/profile" element={<UserProfilePage />} />
             <Route path="/doctors" element={<DoctorListPage />} />
             <Route path="/doctors/:id" element={<DoctorDetailPage />} />
             <Route path="/appointments" element={<AppointmentPage />} />
-            <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/admin" element={<AdminDashboard />} />
           </Route>
 

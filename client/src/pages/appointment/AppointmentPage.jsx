@@ -5,7 +5,7 @@ import { CalendarToday, Cancel, CheckCircle, AccessTime } from '@mui/icons-mater
 import dayjs from 'dayjs';
 import appointmentService from '../../services/appointmentService';
 import authService from '../../services/authService';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import doctorService from '../../services/doctorService';
 
 const AppointmentPage = () => {
   const [appointments, setAppointments] = useState([]);
@@ -23,15 +23,29 @@ const AppointmentPage = () => {
     }
 
     const fetchAppointments = async () => {
-      try {
-        const data = await appointmentService.getUserAppointments(user.id);
-        setAppointments(data);
-      } catch (error) {
-        console.error('Error fetching appointments:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  try {
+    const data = await appointmentService.getUserAppointments(user.id);
+    // Ensure doctor info is complete
+    const appointmentsWithDoctorInfo = await Promise.all(
+      data.map(async appt => {
+        if (!appt.doctorName || !appt.specialty) {
+          const doctor = await doctorService.getDoctorById(appt.doctorId);
+          return {
+            ...appt,
+            doctorName: doctor?.name || 'Unknown Doctor',
+            specialty: doctor?.specialty || 'General'
+          };
+        }
+        return appt;
+      })
+    );
+    setAppointments(appointmentsWithDoctorInfo);
+  } catch (error) {
+    console.error('Error fetching appointments:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
     fetchAppointments();
   }, [location.state, navigate, user.id]);
@@ -56,9 +70,6 @@ const AppointmentPage = () => {
 
   if (loading) {
     return <Typography>Loading appointments...</Typography>;
-  }
-  if (loading) {
-    return <LoadingSpinner />;
   }
 
   return (
